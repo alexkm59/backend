@@ -1,7 +1,13 @@
 const http = require('http');
 const getUsers = require('./modules/users');
 
+
 const hostname = '127.0.0.1';
+
+const ipAddress = "http://127.0.0.1";
+const url = new URL(request.url, ipAddress);
+
+
 const port = 3002;
 const server = http.createServer((req, res) => {
     if(req.url === '/users'){
