@@ -4,7 +4,11 @@
         "name": "Lev"
     },
     {
-        "id": 1,
-        "name": "Georgy"
+        "id": 2,
+        "name": "Gleb"
+    },
+    {
+        "id": 3,
+        "name": "Olga" 
     }
 ]
