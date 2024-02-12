@@ -1,63 +1,43 @@
-const http = require('http');
-const getUsers = require('./modules/users');
+const express = require("express");
+const dotenv = require("dotenv");
+const bodyParser = require ('body-parser');
+const cors = require('cors');
+const mongoose = require('mongoose');
+const userRouter = require('./routes/users');
+const loggerOne = require('./middlewares/loggerOne');
+const loggerTwo = require('./middlewares/loggerTwo');
 
-const hostname = '127.0.0.1';
+dotenv.config();
+const { PORT = 3002, 
+        API_URL = "http://127.0.0.1",
+        MONGO_URL = "mongodb://localhost:27017/backend"
+      } = process.env;
 
-const port = 3002;
-const server = http.createServer((req, res) => {
-    const ipAddress = "http://127.0.0.1";
-    const url = new URL(req.url, ipAddress);
-    console.log(url);
-    console.log(url.searchParams);
-    const searchParams = url.searchParams;
-    
-    
-    for(const key of searchParams.keys()){
-        if(key !=='hello' && key !=='users'){
-            res.statusCode = 500;
-            res.setHeader('Content-Type', 'text/plain');
-            res.end('Page not found');
-            return;
-        }
-    }
-        
-    
-console.log(searchParams.get('hello'));
-console.log(req.url);
-console.log(req.url === '/?hello');
-console.log(searchParams.has('hello'));
-    if (searchParams.has('hello')){
-        const userName = searchParams.get('hello');
-        if (!userName){
-            res.statusCode = 400;
-            res.setHeader('Content-Type', 'text/plain');
-            res.end(`Enter a name`);
-            return;
-        } else {
-            res.statusCode = 200;
-            res.statusMessage = "ok";
-            res.setHeader('Content-Type', 'text/plain');
-            res.end(`Hello, ${userName}`);
-            return;
-          }
-    }
-    
-    if (searchParams.has('users')){
-            res.statusCode = 200;
-            res.setHeader('Content-Type', 'application/json');
-            res.write(getUsers());
-            res.end();
-            return;
-    }
+mongoose.connect(MONGO_URL).then(console.log('Connected to MongoDb')).catch(error => console.log(error));
 
-    res.statusCode = 200;
-    res.setHeader('Content-Type', 'application/json');
-    res.write('hello, wold!');
-    res.end();
+const app = express();
 
+
+
+const helloWorld = (request, response) => {
+  response.status(200);
+  response.send(`Hello, World!`);
+};
+app.use(cors());
+app.use(loggerOne);
+app.use(bodyParser.json());
+
+app.get("/", helloWorld);
+
+app.post("/", (request, response) => {
+  response.status(200);
+  response.send(`Hello from POST!`);
 });
 
-server.listen(port, hostname, () => {
-    console.log(`Сервер запущен по адресу http://${hostname}:${port}/`)
-    
+
+
+app.use(userRouter);
+
+app.listen(PORT, () => {
+  console.log(`Сервер запущен по адресу ${API_URL}:${PORT}`);
 });
